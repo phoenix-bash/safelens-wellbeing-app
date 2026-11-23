@@ -29,6 +29,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- App Installation Permission for In-App Support Module Setup -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!-- Query packages to inspect com.safelens.support on Android 11+ -->
+    <queries>
+        <package android:name="com.safelens.support" />
+    </queries>
+
     <application
         android:name=".SafelensChildApplication"
         android:allowBackup="false"
@@ -37,6 +45,17 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Safelens">
+
+        <!-- FileProvider for Secure APK Package Installation -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <!-- Main Onboarding & Status Activity -->
         <activity

@@ -133,35 +133,74 @@
             android:backgroundTint="#475569"
             app:cornerRadius="10dp" />
 
-        <!-- Support Module Pairing Section -->
+        <!-- Support Module Setup Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Safelens Support Security Module"
+            android:text="Support Security Module"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvSupportStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Status: Pending Initial Handshake"
+            android:text="A secondary background watchdog required to prevent accidental shutdown and monitor device health. It operates headlessly without adding an icon to the app drawer."
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvSupportStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Status: Not Installed"
             android:textColor="@color/danger"
             android:textSize="14sp"
             android:textStyle="bold" />
 
+        <!-- Download Progress Bar -->
+        <ProgressBar
+            android:id="@+id/pbDownloadProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/tvDownloadProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/primary"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <!-- Download & Install Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnInitializeSupport"
+            android:id="@+id/btnDownloadAndInstallSupport"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="24dp"
-            android:text="Initialize Security Module Handshake"
+            android:text="Download &amp; Install Security Module"
             android:textAllCaps="false"
             android:backgroundTint="@color/accent"
+            app:cornerRadius="10dp" />
+
+        <!-- Test Handshake Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInitializeSupport"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            android:text="Verify Watchdog Handshake"
+            android:textAllCaps="false"
+            android:backgroundTint="#64748B"
             app:cornerRadius="10dp" />
 
     </LinearLayout>

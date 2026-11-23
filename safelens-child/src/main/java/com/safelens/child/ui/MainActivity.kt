@@ -2,26 +2,31 @@ package com.safelens.child.ui
 
 import android.Manifest
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.safelens.child.R
 import com.safelens.child.databinding.ActivityMainBinding
+import com.safelens.child.installer.SupportModuleInstaller
+import com.safelens.child.media.MediaSafetyObserver
 import com.safelens.child.notification.NotificationMonitorService
 import com.safelens.child.telephony.CallLogObserver
-import com.safelens.child.media.MediaSafetyObserver
 import com.safelens.child.util.OemBatteryHelper
 import com.safelens.core.ipc.SafelensIpcConstants
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var isDownloading = false
 
     private val requestCallLogPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -62,6 +67,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateUiStatus()
+
+        // Auto-handshake if Support Module was freshly installed
+        if (SupportModuleInstaller.isSupportModuleInstalled(this)) {
+            initializeSupportSecurityModule(showToast = false)
+        }
     }
 
     private fun setupListeners() {
@@ -93,12 +103,63 @@ class MainActivity : AppCompatActivity() {
             OemBatteryHelper.openOemAutostartSettings(this)
         }
 
+        binding.btnDownloadAndInstallSupport.setOnClickListener {
+            handleDownloadAndInstallSupport()
+        }
+
         binding.btnInitializeSupport.setOnClickListener {
-            initializeSupportSecurityModule()
+            initializeSupportSecurityModule(showToast = true)
         }
     }
 
-    private fun initializeSupportSecurityModule() {
+    private fun handleDownloadAndInstallSupport() {
+        if (SupportModuleInstaller.isSupportModuleInstalled(this)) {
+            Toast.makeText(this, "Support Module is already installed and guarding.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!SupportModuleInstaller.canRequestPackageInstalls(this)) {
+            Toast.makeText(this, "Please enable permission to install the companion module.", Toast.LENGTH_LONG).show()
+            startActivity(SupportModuleInstaller.createInstallPermissionIntent(this))
+            return
+        }
+
+        if (isDownloading) return
+
+        isDownloading = true
+        binding.btnDownloadAndInstallSupport.isEnabled = false
+        binding.pbDownloadProgress.visibility = View.VISIBLE
+        binding.pbDownloadProgress.progress = 0
+        binding.tvDownloadProgress.visibility = View.VISIBLE
+        binding.tvDownloadProgress.text = "Downloading from GitHub... 0%"
+
+        lifecycleScope.launch {
+            val result = SupportModuleInstaller.downloadApk(this@MainActivity) { percentage ->
+                binding.pbDownloadProgress.progress = percentage
+                binding.tvDownloadProgress.text = "Downloading from GitHub... $percentage%"
+            }
+
+            isDownloading = false
+            binding.btnDownloadAndInstallSupport.isEnabled = true
+
+            result.onSuccess { apkFile ->
+                binding.tvDownloadProgress.text = "Download complete. Starting installation..."
+                SupportModuleInstaller.triggerInstall(this@MainActivity, apkFile)
+            }.onFailure { error ->
+                binding.tvDownloadProgress.text = "Download failed: ${error.message}"
+                Toast.makeText(this@MainActivity, "Download failed: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun initializeSupportSecurityModule(showToast: Boolean = true) {
+        if (!SupportModuleInstaller.isSupportModuleInstalled(this)) {
+            if (showToast) {
+                Toast.makeText(this, "Support Module is not installed yet.", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
         try {
             // Explicit Intent to wake up the headless Support Security Module from Android's stopped state
             val intent = Intent(SafelensIpcConstants.ACTION_INITIALIZE_SUPPORT).apply {
@@ -116,11 +177,15 @@ class MainActivity : AppCompatActivity() {
                 startService(intent)
             }
 
-            Toast.makeText(this, "Handshake sent to Safelens Support Module", Toast.LENGTH_LONG).show()
-            binding.tvSupportStatus.text = "Status: Initializing / Connected"
-            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, com.safelens.child.R.color.accent))
+            if (showToast) {
+                Toast.makeText(this, "Handshake sent to Safelens Support Module", Toast.LENGTH_LONG).show()
+            }
+            binding.tvSupportStatus.text = "Status: Installed & Guarding (Handshake Active)"
+            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.accent))
         } catch (e: Exception) {
-            Toast.makeText(this, "Support Module not installed or accessible: ${e.message}", Toast.LENGTH_LONG).show()
+            if (showToast) {
+                Toast.makeText(this, "Could not contact Support Module: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -171,6 +236,22 @@ class MainActivity : AppCompatActivity() {
             "✓ Media Safety Filter Active"
         } else {
             "3. Grant Media Safety Filter Access"
+        }
+
+        // Support Module status
+        val isSupportInstalled = SupportModuleInstaller.isSupportModuleInstalled(this)
+        if (isSupportInstalled) {
+            binding.tvSupportStatus.text = "Status: Installed & Guarding"
+            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.accent))
+            binding.btnDownloadAndInstallSupport.text = "✓ Security Module Installed"
+            binding.btnDownloadAndInstallSupport.isEnabled = false
+            binding.pbDownloadProgress.visibility = View.GONE
+            binding.tvDownloadProgress.visibility = View.GONE
+        } else {
+            binding.tvSupportStatus.text = "Status: Not Installed (Action Required)"
+            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.danger))
+            binding.btnDownloadAndInstallSupport.text = "Download & Install Security Module"
+            binding.btnDownloadAndInstallSupport.isEnabled = true
         }
 
         // OEM Detection hint
