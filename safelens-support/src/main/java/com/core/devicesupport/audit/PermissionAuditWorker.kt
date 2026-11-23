@@ -1,4 +1,4 @@
-package com.safelens.support.audit
+package com.core.devicesupport.audit
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -6,42 +6,36 @@ import android.provider.Settings
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.core.devicesupport.DeviceSupportApplication.Companion.TAG
+import com.core.devicesupport.emergency.EmergencyAlertDispatcher
 import com.safelens.core.ipc.SafelensIpcConstants
 import com.safelens.core.model.SecurityEvent
 import com.safelens.core.model.SecurityEventType
-import com.safelens.support.SafelensSupportApplication.Companion.TAG
-import com.safelens.support.emergency.EmergencyAlertDispatcher
 import java.util.UUID
 
-/**
- * Scheduled Audit Worker.
- * Periodically verifies that the primary protection app is present,
- * and that critical accessibility/notification listener permissions have not been secretly toggled off.
- */
 class PermissionAuditWorker(
     private val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        Log.d(TAG, "Executing scheduled Safelens security audit...")
+        Log.d(TAG, "Executing scheduled system health audit...")
 
         val isInstalled = isChildAppInstalled()
         if (!isInstalled) {
-            Log.e(TAG, "Audit Failure: Safelens Child App is missing!")
+            Log.e(TAG, "Audit Failure: Primary Child App is missing!")
             EmergencyAlertDispatcher.dispatchSecurityAlert(
                 context,
                 SecurityEvent(
                     id = UUID.randomUUID().toString(),
                     eventType = SecurityEventType.PACKAGE_UNINSTALLED,
                     affectedPackage = SafelensIpcConstants.CHILD_PACKAGE,
-                    description = "Periodic audit detected Safelens Child App is missing from device."
+                    description = "Periodic audit detected Child App is missing from device."
                 )
             )
             return Result.success()
         }
 
-        // Check if NotificationListener is enabled
         val isNotificationAccessActive = isNotificationListenerEnabled()
         if (!isNotificationAccessActive) {
             Log.w(TAG, "Audit Warning: Notification Listener access has been disabled!")
@@ -51,7 +45,7 @@ class PermissionAuditWorker(
                     id = UUID.randomUUID().toString(),
                     eventType = SecurityEventType.NOTIFICATION_LISTENER_DISABLED,
                     affectedPackage = SafelensIpcConstants.CHILD_PACKAGE,
-                    description = "Notification Listener permission for Safelens Child was disabled in Android Settings.",
+                    description = "Notification Listener permission for Child App was disabled in Android Settings.",
                     severity = "HIGH"
                 )
             )

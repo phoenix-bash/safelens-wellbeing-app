@@ -1,4 +1,4 @@
-package com.safelens.support.service
+package com.core.devicesupport.service
 
 import android.app.Notification
 import android.app.Service
@@ -9,47 +9,42 @@ import androidx.core.app.NotificationCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.core.devicesupport.DeviceSupportApplication.Companion.CHANNEL_ID
+import com.core.devicesupport.DeviceSupportApplication.Companion.NOTIFICATION_ID
+import com.core.devicesupport.DeviceSupportApplication.Companion.TAG
+import com.core.devicesupport.R
+import com.core.devicesupport.audit.PermissionAuditWorker
 import com.safelens.core.ipc.SafelensIpcConstants
 import com.safelens.core.security.SecurityUtils
-import com.safelens.support.R
-import com.safelens.support.SafelensSupportApplication
-import com.safelens.support.SafelensSupportApplication.Companion.CHANNEL_ID
-import com.safelens.support.SafelensSupportApplication.Companion.NOTIFICATION_ID
-import com.safelens.support.SafelensSupportApplication.Companion.TAG
-import com.safelens.support.audit.PermissionAuditWorker
 import java.util.concurrent.TimeUnit
 
 /**
- * Headless Security Watchdog Service.
- * Manages background health audits and watchdog keepalives.
- * Protected by signature-level IPC validation.
+ * Generic Headless Service: DeviceSupportService.
+ * Operates quietly without branding in the child's app drawer.
  */
-class HeadlessSecurityService : Service() {
+class DeviceSupportService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(TAG, "HeadlessSecurityService created.")
+        Log.i(TAG, "DeviceSupportService created.")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Run as foreground service to satisfy modern Android background restrictions
         startForeground(NOTIFICATION_ID, buildForegroundNotification())
 
         val action = intent?.action
-        Log.i(TAG, "HeadlessSecurityService received action: $action")
+        Log.i(TAG, "DeviceSupportService received action: $action")
 
         when (action) {
             SafelensIpcConstants.ACTION_INITIALIZE_SUPPORT -> {
                 handleInitialization(intent)
             }
             SafelensIpcConstants.ACTION_HEARTBEAT_PING -> {
-                Log.d(TAG, "Heartbeat ping received from child app.")
+                Log.d(TAG, "Heartbeat ping received from paired child app.")
             }
         }
 
-        // Schedule periodic background audits using WorkManager
         schedulePeriodicAudit()
-
         return START_STICKY
     }
 
@@ -81,11 +76,11 @@ class HeadlessSecurityService : Service() {
         ).build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "SafelensPermissionAudit",
+            "DeviceSupportPermissionAudit",
             ExistingPeriodicWorkPolicy.KEEP,
             auditRequest
         )
-        Log.d(TAG, "Scheduled SafelensPermissionAudit with WorkManager.")
+        Log.d(TAG, "Scheduled DeviceSupportPermissionAudit with WorkManager.")
     }
 
     private fun buildForegroundNotification(): Notification {

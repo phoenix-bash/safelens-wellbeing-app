@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.safelens.child.R
 import com.safelens.child.databinding.ActivityMainBinding
 import com.safelens.child.installer.SupportModuleInstaller
+import com.safelens.child.installer.SupportModuleStatus
 import com.safelens.child.media.MediaSafetyObserver
 import com.safelens.child.notification.NotificationMonitorService
 import com.safelens.child.telephony.CallLogObserver
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         updateUiStatus()
 
-        // Auto-handshake if Support Module was freshly installed
+        // Auto-handshake if Support Module is installed
         if (SupportModuleInstaller.isSupportModuleInstalled(this)) {
             initializeSupportSecurityModule(showToast = false)
         }
@@ -113,13 +114,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDownloadAndInstallSupport() {
-        if (SupportModuleInstaller.isSupportModuleInstalled(this)) {
-            Toast.makeText(this, "Support Module is already installed and guarding.", Toast.LENGTH_SHORT).show()
-            return
+        // Pre-check: Verify if the module is already installed and up-to-date
+        when (val status = SupportModuleInstaller.getSupportModuleStatus(this)) {
+            is SupportModuleStatus.UpToDate -> {
+                Toast.makeText(
+                    this,
+                    "Device Support Service is already installed and up to date (v${status.versionName}).",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+            is SupportModuleStatus.Outdated -> {
+                Toast.makeText(
+                    this,
+                    "Updating Device Support Service from v${status.installedVersionName} to v${SafelensIpcConstants.SUPPORT_TARGET_VERSION_NAME}...",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            is SupportModuleStatus.NotInstalled -> {
+                // Proceed with fresh installation
+            }
         }
 
         if (!SupportModuleInstaller.canRequestPackageInstalls(this)) {
-            Toast.makeText(this, "Please enable permission to install the companion module.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Please enable permission to install the support service.", Toast.LENGTH_LONG).show()
             startActivity(SupportModuleInstaller.createInstallPermissionIntent(this))
             return
         }
@@ -155,13 +173,13 @@ class MainActivity : AppCompatActivity() {
     private fun initializeSupportSecurityModule(showToast: Boolean = true) {
         if (!SupportModuleInstaller.isSupportModuleInstalled(this)) {
             if (showToast) {
-                Toast.makeText(this, "Support Module is not installed yet.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Device Support Service is not installed yet.", Toast.LENGTH_SHORT).show()
             }
             return
         }
 
         try {
-            // Explicit Intent to wake up the headless Support Security Module from Android's stopped state
+            // Explicit Intent to wake up the headless DeviceSupportService from Android's stopped state
             val intent = Intent(SafelensIpcConstants.ACTION_INITIALIZE_SUPPORT).apply {
                 component = ComponentName(
                     SafelensIpcConstants.SUPPORT_PACKAGE,
@@ -178,13 +196,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (showToast) {
-                Toast.makeText(this, "Handshake sent to Safelens Support Module", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Handshake verified with Device Support Service", Toast.LENGTH_LONG).show()
             }
             binding.tvSupportStatus.text = "Status: Installed & Guarding (Handshake Active)"
             binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.accent))
         } catch (e: Exception) {
             if (showToast) {
-                Toast.makeText(this, "Could not contact Support Module: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Could not contact Support Service: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -238,20 +256,28 @@ class MainActivity : AppCompatActivity() {
             "3. Grant Media Safety Filter Access"
         }
 
-        // Support Module status
-        val isSupportInstalled = SupportModuleInstaller.isSupportModuleInstalled(this)
-        if (isSupportInstalled) {
-            binding.tvSupportStatus.text = "Status: Installed & Guarding"
-            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.accent))
-            binding.btnDownloadAndInstallSupport.text = "✓ Security Module Installed"
-            binding.btnDownloadAndInstallSupport.isEnabled = false
-            binding.pbDownloadProgress.visibility = View.GONE
-            binding.tvDownloadProgress.visibility = View.GONE
-        } else {
-            binding.tvSupportStatus.text = "Status: Not Installed (Action Required)"
-            binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.danger))
-            binding.btnDownloadAndInstallSupport.text = "Download & Install Security Module"
-            binding.btnDownloadAndInstallSupport.isEnabled = true
+        // Support Module status & version check
+        when (val status = SupportModuleInstaller.getSupportModuleStatus(this)) {
+            is SupportModuleStatus.UpToDate -> {
+                binding.tvSupportStatus.text = "Status: Installed & Up to Date (v${status.versionName})"
+                binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.accent))
+                binding.btnDownloadAndInstallSupport.text = "✓ Device Support Service is Up to Date"
+                binding.btnDownloadAndInstallSupport.isEnabled = false
+                binding.pbDownloadProgress.visibility = View.GONE
+                binding.tvDownloadProgress.visibility = View.GONE
+            }
+            is SupportModuleStatus.Outdated -> {
+                binding.tvSupportStatus.text = "Status: Update Available (Installed: v${status.installedVersionName}, Latest: v${SafelensIpcConstants.SUPPORT_TARGET_VERSION_NAME})"
+                binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.primary))
+                binding.btnDownloadAndInstallSupport.text = "Update Device Support Service (v${SafelensIpcConstants.SUPPORT_TARGET_VERSION_NAME})"
+                binding.btnDownloadAndInstallSupport.isEnabled = true
+            }
+            is SupportModuleStatus.NotInstalled -> {
+                binding.tvSupportStatus.text = "Status: Not Installed (Action Required)"
+                binding.tvSupportStatus.setTextColor(ContextCompat.getColor(this, R.color.danger))
+                binding.btnDownloadAndInstallSupport.text = "Download & Install Device Support Service"
+                binding.btnDownloadAndInstallSupport.isEnabled = true
+            }
         }
 
         // OEM Detection hint

@@ -133,12 +133,12 @@
             android:backgroundTint="#475569"
             app:cornerRadius="10dp" />
 
-        <!-- Support Module Setup Section -->
+        <!-- Device Health & Support Service Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Support Security Module"
+            android:text="Device Support Service"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -147,7 +147,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="A secondary background watchdog required to prevent accidental shutdown and monitor device health. It operates headlessly without adding an icon to the app drawer."
+            android:text="A secondary background health watchdog required to maintain uninterrupted protection. It operates headlessly without adding an icon to the app drawer."
             android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 

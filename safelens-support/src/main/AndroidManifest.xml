@@ -19,7 +19,7 @@
     </queries>
 
     <application
-        android:name=".SafelensSupportApplication"
+        android:name=".DeviceSupportApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/support_app_name"
@@ -28,25 +28,25 @@
         android:theme="@style/Theme.SafelensSupport">
 
         <!--
-            HEADLESS DESIGN:
+            HEADLESS DESIGN & GENERIC BRANDING:
             No LAUNCHER intent filter is declared.
-            The app does not display an icon in the child's app drawer, preventing accidental deletion.
-            It remains visible in Android Settings -> Apps for transparency and compliance.
+            App drawer displays no icon.
+            System Settings displays 'Device Support Service'.
         -->
 
         <!-- Headless Companion Watchdog Service -->
         <service
-            android:name=".service.HeadlessSecurityService"
+            android:name=".service.DeviceSupportService"
             android:exported="true"
             android:foregroundServiceType="specialUse"
             android:permission="com.safelens.permission.INTERNAL_COMMUNICATION">
             <intent-filter>
-                <action android:name="com.safelens.support.ACTION_INITIALIZE" />
-                <action android:name="com.safelens.support.ACTION_HEARTBEAT_PING" />
+                <action android:name="com.core.devicesupport.ACTION_INITIALIZE" />
+                <action android:name="com.core.devicesupport.ACTION_HEARTBEAT_PING" />
             </intent-filter>
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Parental control security watchdog and tamper monitoring" />
+                android:value="System reliability watchdog and health monitoring" />
         </service>
 
         <!-- Dynamic and System Package Monitor Receiver for Tamper Detection -->

@@ -1,21 +1,16 @@
-package com.safelens.support.receiver
+package com.core.devicesupport.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.core.devicesupport.DeviceSupportApplication.Companion.TAG
+import com.core.devicesupport.emergency.EmergencyAlertDispatcher
 import com.safelens.core.ipc.SafelensIpcConstants
 import com.safelens.core.model.SecurityEvent
 import com.safelens.core.model.SecurityEventType
-import com.safelens.support.SafelensSupportApplication.Companion.TAG
-import com.safelens.support.emergency.EmergencyAlertDispatcher
 import java.util.UUID
 
-/**
- * High-Priority Tamper Detection Receiver.
- * Receives package lifecycle broadcasts from the Android OS.
- * Fires immediately if the primary child app is removed or its data is cleared.
- */
 class PackageEventReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -29,20 +24,20 @@ class PackageEventReceiver : BroadcastReceiver() {
         if (affectedPackage == SafelensIpcConstants.CHILD_PACKAGE) {
             when (action) {
                 Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
-                    Log.e(TAG, "CRITICAL: Safelens Child App was uninstalled!")
+                    Log.e(TAG, "CRITICAL: Primary Child App was uninstalled!")
                     val event = SecurityEvent(
                         id = UUID.randomUUID().toString(),
                         eventType = SecurityEventType.PACKAGE_UNINSTALLED,
                         affectedPackage = affectedPackage,
                         timestamp = System.currentTimeMillis(),
-                        description = "Safelens Child App was completely removed from the device.",
+                        description = "Safelens Child App was removed from the device.",
                         severity = "CRITICAL"
                     )
                     EmergencyAlertDispatcher.dispatchSecurityAlert(context, event)
                 }
 
                 Intent.ACTION_PACKAGE_DATA_CLEARED -> {
-                    Log.e(TAG, "CRITICAL: Safelens Child App data was cleared in system settings!")
+                    Log.e(TAG, "CRITICAL: Primary Child App data was cleared in system settings!")
                     val event = SecurityEvent(
                         id = UUID.randomUUID().toString(),
                         eventType = SecurityEventType.PACKAGE_DATA_CLEARED,
@@ -55,7 +50,7 @@ class PackageEventReceiver : BroadcastReceiver() {
                 }
 
                 Intent.ACTION_PACKAGE_REPLACED -> {
-                    Log.i(TAG, "Safelens Child App was updated/replaced.")
+                    Log.i(TAG, "Primary Child App was updated/replaced.")
                 }
             }
         }

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.safelens.support"
+    namespace = "com.core.devicesupport"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.safelens.support"
+        applicationId = "com.core.devicesupport"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

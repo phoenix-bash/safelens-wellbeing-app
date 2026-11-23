@@ -1,4 +1,4 @@
-package com.safelens.support
+package com.core.devicesupport
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -7,11 +7,11 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 
-class SafelensSupportApplication : Application() {
+class DeviceSupportApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(TAG, "Safelens Support Security Module initialized.")
+        Log.i(TAG, "Device Support Service initialized.")
         createNotificationChannel()
     }
 
@@ -32,8 +32,8 @@ class SafelensSupportApplication : Application() {
     }
 
     companion object {
-        const val TAG = "SafelensSupport"
-        const val CHANNEL_ID = "safelens_security_watchdog_channel"
+        const val TAG = "DeviceSupport"
+        const val CHANNEL_ID = "device_support_background_channel"
         const val NOTIFICATION_ID = 2001
     }
 }

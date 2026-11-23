@@ -2,6 +2,7 @@ package com.safelens.child.installer
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -17,22 +18,67 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
+sealed class SupportModuleStatus {
+    object NotInstalled : SupportModuleStatus()
+    data class Outdated(
+        val installedVersionCode: Long,
+        val targetVersionCode: Long,
+        val installedVersionName: String
+    ) : SupportModuleStatus()
+    data class UpToDate(
+        val versionCode: Long,
+        val versionName: String
+    ) : SupportModuleStatus()
+}
+
 object SupportModuleInstaller {
 
-    // Default GitHub repository release download URL for Safelens Support Module
+    // Default GitHub repository release download URL for Support Module
     const val DEFAULT_GITHUB_APK_URL =
         "https://github.com/safelens-project/safelens/releases/latest/download/safelens-support-debug.apk"
 
     /**
-     * Checks whether the Safelens Support Module is currently installed on the device.
+     * Checks the precise installation and version state of the Device Support Service.
      */
-    fun isSupportModuleInstalled(context: Context): Boolean {
+    fun getSupportModuleStatus(
+        context: Context,
+        targetVersionCode: Long = SafelensIpcConstants.SUPPORT_TARGET_VERSION_CODE.toLong()
+    ): SupportModuleStatus {
         return try {
-            context.packageManager.getPackageInfo(SafelensIpcConstants.SUPPORT_PACKAGE, 0)
-            true
+            val packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(
+                    SafelensIpcConstants.SUPPORT_PACKAGE,
+                    PackageManager.PackageInfoFlags.of(0)
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(SafelensIpcConstants.SUPPORT_PACKAGE, 0)
+            }
+
+            val installedVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageInfo.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo.versionCode.toLong()
+            }
+            val installedVersionName = packageInfo.versionName ?: "unknown"
+
+            if (installedVersionCode >= targetVersionCode) {
+                SupportModuleStatus.UpToDate(installedVersionCode, installedVersionName)
+            } else {
+                SupportModuleStatus.Outdated(installedVersionCode, targetVersionCode, installedVersionName)
+            }
         } catch (_: PackageManager.NameNotFoundException) {
-            false
+            SupportModuleStatus.NotInstalled
         }
+    }
+
+    fun isSupportModuleInstalled(context: Context): Boolean {
+        return getSupportModuleStatus(context) !is SupportModuleStatus.NotInstalled
+    }
+
+    fun isSupportModuleUpToDate(context: Context): Boolean {
+        return getSupportModuleStatus(context) is SupportModuleStatus.UpToDate
     }
 
     /**
@@ -73,7 +119,7 @@ object SupportModuleInstaller {
         var connection: HttpURLConnection? = null
         try {
             val destinationDir = context.externalCacheDir ?: context.cacheDir
-            val targetFile = File(destinationDir, "safelens-support.apk")
+            val targetFile = File(destinationDir, "device-support.apk")
             if (targetFile.exists()) {
                 targetFile.delete()
             }

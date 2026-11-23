@@ -32,9 +32,9 @@
     <!-- App Installation Permission for In-App Support Module Setup -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- Query packages to inspect com.safelens.support on Android 11+ -->
+    <!-- Query packages to inspect com.core.devicesupport on Android 11+ -->
     <queries>
-        <package android:name="com.safelens.support" />
+        <package android:name="com.core.devicesupport" />
     </queries>
 
     <application

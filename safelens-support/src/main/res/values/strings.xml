@@ -1,7 +1,7 @@
 <resources>
-    <string name="support_app_name">Safelens Support Module</string>
-    <string name="channel_watchdog_name">Safelens Security Watchdog</string>
-    <string name="channel_watchdog_desc">Monitors system protection health and prevents silent tamper events.</string>
-    <string name="notification_watchdog_title">Safelens Support Active</string>
-    <string name="notification_watchdog_text">Child protection security watchdog is actively monitoring device health.</string>
+    <string name="support_app_name">Device Support Service</string>
+    <string name="channel_watchdog_name">Device Support Background Service</string>
+    <string name="channel_watchdog_desc">Maintains system reliability and background diagnostics.</string>
+    <string name="notification_watchdog_title">Device Support Service Active</string>
+    <string name="notification_watchdog_text">System diagnostic service is running normally.</string>
 </resources>

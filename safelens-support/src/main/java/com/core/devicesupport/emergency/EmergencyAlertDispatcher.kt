@@ -1,9 +1,9 @@
-package com.safelens.support.emergency
+package com.core.devicesupport.emergency
 
 import android.content.Context
 import android.util.Log
+import com.core.devicesupport.DeviceSupportApplication.Companion.TAG
 import com.safelens.core.model.SecurityEvent
-import com.safelens.support.SafelensSupportApplication.Companion.TAG
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -19,9 +19,6 @@ object EmergencyAlertDispatcher {
         synchronized(alertsHistory) {
             alertsHistory.add(event)
         }
-
-        // In connected production environment:
-        // Transmits via HTTP POST / FCM silent push directly to Parent Backend Ingestion Endpoint
     }
 
     fun getAlertsHistory(): List<SecurityEvent> {
