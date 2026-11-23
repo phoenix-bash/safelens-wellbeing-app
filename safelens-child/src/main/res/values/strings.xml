@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Safelens Child</string>
+    <string name="title_privacy_charter">Safelens Privacy Charter</string>
+    <string name="desc_privacy_charter">We strictly protect your privacy. This app does NOT access your camera, microphone, or GPS location.</string>
+    <string name="btn_grant_notifications">Enable Notification Access</string>
+    <string name="btn_grant_call_log">Grant Call Log Permission</string>
+    <string name="btn_grant_media">Grant Media Safety Permission</string>
+    <string name="btn_pair_support">Initialize Security Module</string>
+    <string name="btn_oem_optimization">Configure Battery &amp; Autostart</string>
+    <string name="status_connected">Support Security Module: Connected</string>
+    <string name="status_disconnected">Support Security Module: Pending Setup</string>
+</resources>

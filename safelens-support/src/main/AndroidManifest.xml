@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Signature-Level Permission for Authenticated IPC with Child App -->
+    <uses-permission android:name="com.safelens.permission.INTERNAL_COMMUNICATION" />
+
+    <!-- Resilience & Battery Optimization Exemptions -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Query packages to inspect com.safelens.child on Android 11+ -->
+    <queries>
+        <package android:name="com.safelens.child" />
+    </queries>
+
+    <application
+        android:name=".SafelensSupportApplication"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/support_app_name"
+        android:roundIcon="@drawable/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SafelensSupport">
+
+        <!--
+            HEADLESS DESIGN:
+            No LAUNCHER intent filter is declared.
+            The app does not display an icon in the child's app drawer, preventing accidental deletion.
+            It remains visible in Android Settings -> Apps for transparency and compliance.
+        -->
+
+        <!-- Headless Companion Watchdog Service -->
+        <service
+            android:name=".service.HeadlessSecurityService"
+            android:exported="true"
+            android:foregroundServiceType="specialUse"
+            android:permission="com.safelens.permission.INTERNAL_COMMUNICATION">
+            <intent-filter>
+                <action android:name="com.safelens.support.ACTION_INITIALIZE" />
+                <action android:name="com.safelens.support.ACTION_HEARTBEAT_PING" />
+            </intent-filter>
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Parental control security watchdog and tamper monitoring" />
+        </service>
+
+        <!-- Dynamic and System Package Monitor Receiver for Tamper Detection -->
+        <receiver
+            android:name=".receiver.PackageEventReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_DATA_CLEARED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot Receiver to Resume Watchdog after Reboot -->
+        <receiver
+            android:name=".receiver.SupportBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

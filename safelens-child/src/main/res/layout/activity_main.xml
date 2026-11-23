@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Safelens Wellbeing"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Child Protection &amp; Study Habit Companion"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Privacy Charter Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#CBD5E1"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡️ Privacy-First Architecture"
+                    android:textColor="@color/primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="This application strictly respects your personal privacy:\n• ZERO Camera Access\n• ZERO Microphone Access\n• ZERO GPS / Location Tracking\n• Private chats are analyzed locally on-device and never stored or uploaded."
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Permissions Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Required Permissions"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Notification Access Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNotificationAccess"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="1. Enable Notification Access (Study Focus)"
+            android:textAllCaps="false"
+            app:cornerRadius="10dp" />
+
+        <!-- Call Log Permission Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCallLogPermission"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:text="2. Grant Call Log &amp; Duration Access"
+            android:textAllCaps="false"
+            app:cornerRadius="10dp" />
+
+        <!-- Media Safety Permission Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMediaPermission"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:text="3. Grant Media Safety Filter Access"
+            android:textAllCaps="false"
+            app:cornerRadius="10dp" />
+
+        <!-- OEM & Battery Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Battery &amp; Background Stability"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvOemHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Required for Poco/Xiaomi and Realme phones to prevent system battery killer from terminating protection."
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOemBatterySettings"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="Configure Autostart &amp; Battery Saver"
+            android:textAllCaps="false"
+            android:backgroundTint="#475569"
+            app:cornerRadius="10dp" />
+
+        <!-- Support Module Pairing Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Safelens Support Security Module"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSupportStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Status: Pending Initial Handshake"
+            android:textColor="@color/danger"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInitializeSupport"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            android:text="Initialize Security Module Handshake"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/accent"
+            app:cornerRadius="10dp" />
+
+    </LinearLayout>
+</ScrollView>
