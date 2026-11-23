@@ -33,9 +33,9 @@ sealed class SupportModuleStatus {
 
 object SupportModuleInstaller {
 
-    // Default GitHub repository release download URL for Support Module
+    // Official GitHub repository release download URL for Device Support Service
     const val DEFAULT_GITHUB_APK_URL =
-        "https://github.com/safelens-project/safelens/releases/latest/download/safelens-support-debug.apk"
+        "https://github.com/phoenix-bash/safelens-wellbeing-app/releases/latest/download/safelens-support-debug.apk"
 
     /**
      * Checks the precise installation and version state of the Device Support Service.

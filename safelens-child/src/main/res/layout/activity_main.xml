@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Safelens Wellbeing"
-            android:textColor="@color/text_primary"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="26sp"
             android:textStyle="bold" />
 
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Child Protection &amp; Study Habit Companion"
-            android:textColor="@color/text_secondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp" />
 
         <!-- Privacy Charter Card -->
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="This application strictly respects your personal privacy:\n• ZERO Camera Access\n• ZERO Microphone Access\n• ZERO GPS / Location Tracking\n• Private chats are analyzed locally on-device and never stored or uploaded."
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:lineSpacingExtra="3dp" />
             </LinearLayout>
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Required Permissions"
-            android:textColor="@color/text_primary"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -110,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Battery &amp; Background Stability"
-            android:textColor="@color/text_primary"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -120,7 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Required for Poco/Xiaomi and Realme phones to prevent system battery killer from terminating protection."
-            android:textColor="@color/text_secondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Device Support Service"
-            android:textColor="@color/text_primary"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="A secondary background health watchdog required to maintain uninterrupted protection. It operates headlessly without adding an icon to the app drawer."
-            android:textColor="@color/text_secondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="13sp" />
 
         <TextView
